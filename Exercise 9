@@ -1,0 +1,170 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.*;
+
+class GenieHulkFrame extends JFrame implements KeyListener
+{
+    private JLabel      contentpane;
+    private MyLabel     GenieLabel, HulkLabel, targetLabel;
+    // adjust frame's size as you want
+    private int frameWidth = 800, frameHeight = 500;
+
+    public GenieHulkFrame()
+    {
+	setTitle("Genie moves");
+	setBounds(50, 50, frameWidth, frameHeight);
+	setVisible(true);
+	setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
+
+	// set background image by using JLabel as contentpane
+	setContentPane(contentpane = new JLabel());
+	MyImageIcon background = new MyImageIcon("resources/background.jpg");
+	contentpane.setIcon( background.resize(frameWidth, frameHeight) );
+	contentpane.setLayout( null );
+
+	GenieLabel = new MyLabel("resources/genie.png", "resources/jasmine.png"); 
+        GenieLabel.setMoveConditions(500, 100, true, true); //you can do both horizontal or vertical
+        contentpane.add(GenieLabel);
+        
+        HulkLabel  = new MyLabel("resources/hulk.png", "resources/hulkbuster.png");  
+        HulkLabel.setMoveConditions(100, 200, true, false); //you can do only horizontal not vertical
+        contentpane.add(HulkLabel);
+        
+        targetLabel = GenieLabel;
+        addKeyListener(this);
+	repaint();
+    } 
+    public void keyTyped(KeyEvent e){}
+    public void keyPressed(KeyEvent e) 
+    {
+     if (e.getKeyCode() == KeyEvent.VK_UP) targetLabel.moveUp();
+     if (e.getKeyCode() == KeyEvent.VK_DOWN) targetLabel.moveDown();
+     if (e.getKeyCode() == KeyEvent.VK_LEFT) targetLabel.moveLeft();
+     if (e.getKeyCode() == KeyEvent.VK_RIGHT) targetLabel.moveRight();
+     if (e.getKeyCode() == KeyEvent.VK_G)
+        {
+            targetLabel = GenieLabel;
+            setTitle("Genie moves");
+        }
+    if (e.getKeyCode() == KeyEvent.VK_H)
+        {
+            targetLabel = HulkLabel;
+            setTitle("Hulk moves");
+        }
+    }
+
+    
+    public void keyReleased( KeyEvent e ){}
+    public static void main(String[] args) 
+    {
+	new GenieHulkFrame();
+    }	
+}
+
+
+class MyLabel extends JLabel implements MouseListener
+{
+    private int width = 150, height = 200;      // adjust label size as you want
+    private MyImageIcon   icon1, icon2;
+    private int           curX, curY;
+    private boolean       horizontalMove, verticalMove;
+
+    public MyLabel(String file1, String file2)				
+    { 
+        icon1 = new MyImageIcon(file1).resize(width, height); /*example on how to create imageicon and resize */
+        icon2 = new MyImageIcon(file2).resize(width, height);
+	setHorizontalAlignment(JLabel.CENTER);
+	setIcon(icon1); //set Icon, we use Genie icon first
+        addMouseListener(this);
+    }
+    
+    public void setMoveConditions(int x, int y, boolean h, boolean v)
+    {
+        curX = x; curY = y;
+	setBounds(curX, curY, width, height);
+        horizontalMove = h; verticalMove = v;        
+    }
+    // add your own code
+    public void moveUp() 
+    {
+            if(verticalMove) 
+        {
+            if (curY > 0) curY -= 10;
+            else curY = 0;
+            setLocation(curX, curY);
+        }
+    }
+    public void moveDown() 
+    { 
+        if(verticalMove) 
+        {
+            if (curY < 510 - height) curY += 10;
+            else curY = 510 - height;
+            setLocation(curX, curY);
+        }
+    }
+    public void moveLeft()
+    {
+        if(horizontalMove) 
+        {
+            if (curX < 20) curX = 635;
+            else curX -= 10;
+            setLocation(curX, curY);
+        }}
+    public void moveRight() 
+    {
+        if(horizontalMove) 
+        {
+            if (curX > 630) curX = 5;
+            else curX += 10;
+            setLocation(curX, curY);
+        }
+    }
+    
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            setIcon(icon2);
+        }
+        if(e.getButton() == MouseEvent.BUTTON3) {
+            setIcon(icon1);
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+}
+
+
+// auxiliary class to resize image
+class MyImageIcon extends ImageIcon
+{
+    public MyImageIcon(String fname)  { super(fname); }
+    public MyImageIcon(Image image)   { super(image); }
+
+    public MyImageIcon resize(int width, int height)
+    {
+	Image oldimg = this.getImage();
+	Image newimg = oldimg.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+        return new MyImageIcon(newimg);
+    }
+};
+
